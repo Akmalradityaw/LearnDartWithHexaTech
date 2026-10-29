@@ -1,0 +1,52 @@
+<svg width="32" height="32" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Neobrutalist Shadow Silhouette -->
+  <path
+    d="M24 5L39 13.5V30.5L24 39L9 30.5V13.5L24 5Z"
+    fill="#111111"
+  />
+
+  <!-- Main Outer Hexagon -->
+  <path
+    d="M22 3L37 11.5V28.5L22 37L7 28.5V11.5L22 3Z"
+    fill="#FFFFFF"
+    stroke="#111111"
+    strokeWidth="2.5"
+    strokeLinejoin="miter"
+  />
+
+  <!-- Dart Arrowhead - Left Wing (Deep Black) -->
+  <path
+    d="M22 9L12 25L22 21V9Z"
+    fill="#111111"
+    stroke="#111111"
+    strokeWidth="1.5"
+    strokeLinejoin="miter"
+  />
+
+  <!-- Dart Arrowhead - Right Wing (HexaTech Electric Violet) -->
+  <path
+    d="M22 9L32 25L22 21V9Z"
+    fill="#7C3AED"
+    stroke="#111111"
+    strokeWidth="1.5"
+    strokeLinejoin="miter"
+  />
+
+  <!-- Center Prismatic Core -->
+  <path
+    d="M22 13L26 23L22 21L18 23L22 13Z"
+    fill="#DDD6FE"
+    stroke="#111111"
+    strokeWidth="1"
+  />
+
+  <!-- Small Tech Beacon -->
+  <circle
+    cx="22"
+    cy="30.5"
+    r="1.8"
+    fill="#7C3AED"
+    stroke="#111111"
+    strokeWidth="1"
+  />
+</svg>
