@@ -3,12 +3,26 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { navigation } from '@/data/navigation';
-import { CheckCircle2, Circle } from 'lucide-react';
+import { CheckCircle2, Circle, FileText, CheckSquare, BookOpen, ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [completedSlugs, setCompletedSlugs] = useState<Record<string, boolean>>({});
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    // Open by default on desktop (>= 768px), closed by default on mobile (< 768px)
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    setIsOpen(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsOpen(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   useEffect(() => {
     const loadProgress = () => {
@@ -41,12 +55,12 @@ export default function Sidebar() {
         overflow-y-auto
         border-b-2 md:border-b-0 md:border-r-2 border-[#111111]
         bg-[#F4F4F0] text-[#111111]
-        pb-20 p-5
+        p-4 sm:p-5 md:pb-20
         [scrollbar-width:none]
       "
     >
       {/* ─── Progress Header ─── */}
-      <div className="mb-8 border-2 border-[#111111] bg-white p-4 shadow-[4px_4px_0_0_#111111]">
+      <div className="mb-5 md:mb-8 border-2 border-[#111111] bg-white p-4 shadow-[4px_4px_0_0_#111111]">
         <div className="flex items-center justify-between mb-3">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.1em] text-[#111111]">
             PROGRESS
@@ -66,8 +80,21 @@ export default function Sidebar() {
         </p>
       </div>
 
-      {/* ─── Navigation ─── */}
-      <nav className="space-y-8">
+      {/* ─── Navigation (Collapsible on Mobile, Open on Desktop) ─── */}
+      <details
+        open={isOpen}
+        onToggle={(e) => setIsOpen(e.currentTarget.open)}
+        className="group/details md:open"
+      >
+        <summary className="md:hidden cursor-pointer list-none flex items-center justify-between border-2 border-[#111111] bg-white p-3 font-mono text-xs font-bold uppercase tracking-wider text-[#111111] shadow-[3px_3px_0_0_#111111] mb-5 select-none hover:bg-stone-50">
+          <span className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-violet-600" />
+            <span>Daftar Materi ({totalItems} Topik)</span>
+          </span>
+          <ChevronDown className="w-4 h-4 transition-transform group-open/details:rotate-180" />
+        </summary>
+
+        <nav className="space-y-8">
         {navigation.map((section, idx) => {
           const sectionCompleted = section.items.filter(
             (i) => completedSlugs[i.slug]
@@ -131,6 +158,42 @@ export default function Sidebar() {
                         {/* Title */}
                         <span className="leading-tight uppercase">{item.title}</span>
                       </Link>
+
+                      {/* Sub-branches for active item */}
+                      {isActive && item.branches && item.branches.length > 0 && (
+                        <ul className="ml-4 mt-2 space-y-1 border-l-2 border-[#111111] pl-3 py-1">
+                          {item.branches.map((branch, bIdx) => (
+                            <li key={bIdx}>
+                              <a
+                                href={`/learn/${item.slug}${branch.anchor}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  const targetId = branch.anchor.replace('#', '');
+                                  const element = document.getElementById(targetId);
+                                  if (element) {
+                                    const yOffset = -85; // navbar height (64px) + breathing space
+                                    const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+                                    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+                                    window.history.pushState(null, '', branch.anchor);
+                                  } else {
+                                    window.location.hash = branch.anchor;
+                                  }
+                                }}
+                                className="group/branch flex items-center gap-2 py-1 text-xs font-mono text-[#444444] hover:text-[#111111] hover:font-bold transition-all cursor-pointer"
+                              >
+                                {branch.type === 'task' ? (
+                                  <CheckSquare className="h-3 w-3 text-violet-600 flex-shrink-0" />
+                                ) : (
+                                  <FileText className="h-3 w-3 text-stone-500 group-hover/branch:text-violet-600 flex-shrink-0 transition-colors" />
+                                )}
+                                <span className="group-hover/branch:text-violet-600 group-hover/branch:underline decoration-1 underline-offset-2">
+                                  {branch.title}
+                                </span>
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   );
                 })}
@@ -139,6 +202,7 @@ export default function Sidebar() {
           );
         })}
       </nav>
+      </details>
     </aside>
   );
 }
